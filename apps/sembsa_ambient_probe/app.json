@@ -2,7 +2,7 @@
   "id": "sembsa_ambient_probe",
   "title": "Ambient Probe",
   "description": "Read-only: looks in the head unit's SOME/IP catalog for the ambient light service (ComfortFunctionIuK, 0xB512) and lists its fields and methods. Sends nothing to the car",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "vendor": "custom",
   "loggingId": "OAA9",
   "iconGlyph": "AL",
