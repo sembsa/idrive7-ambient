@@ -1,18 +1,65 @@
 {
   "id": "sembsa_ambient_probe",
   "title": "Ambient Probe",
-  "description": "Read-only: looks in the head unit's SOME/IP catalog for the ambient light service (ComfortFunctionIuK, 0xB512) and lists its fields and methods. Sends nothing to the car",
-  "version": "0.1.1",
+  "description": "Read-only: shows the ambient light fields of the head unit SOME/IP catalog (0xB512, 0xB09E) in full and logs the car's ambient colour notifications with a time stamp. Writes nothing to the car",
+  "version": "0.2.0",
   "vendor": "custom",
   "loggingId": "OAA9",
   "iconGlyph": "AL",
-  "signals": {},
+  "signals": {
+    "de.bmw.infotainment.misc.ComfortFunctionIuK": {
+      "_instances": "1",
+      "statusAmbientLightInteriorColour": "rs",
+      "_optional": "Live log of the ambient colour"
+    },
+    "de.bmw.body.interiorillumination.AmbientLight": {
+      "_instances": "1",
+      "currentInteriorLightProfile": "rs",
+      "brightnessAmbientLight": "rs",
+      "_optional": "Live log of the light profile and brightness"
+    }
+  },
   "screens": [
-    { "name": "MAIN", "kind": "canvas", "title": "Ambient Probe",
-      "buttons": [["BTN_NEXT", "Next page"], ["BTN_SETTINGS", "Settings"]] }
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "Ambient Probe",
+      "buttons": [
+        [
+          "BTN_NEXT",
+          "Next page"
+        ],
+        [
+          "BTN_MODE",
+          "Mode"
+        ],
+        [
+          "BTN_SETTINGS",
+          "Settings"
+        ]
+      ]
+    }
   ],
   "settings": [
-    { "key": "demo", "label": "Demo catalog", "type": "choice", "default": "auto",
-      "options": [["auto", "Auto (when no catalog)"], ["on", "On"], ["off", "Off"]] }
+    {
+      "key": "demo",
+      "label": "Demo catalog",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto (when no catalog)"
+        ],
+        [
+          "on",
+          "On"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    }
   ]
 }
