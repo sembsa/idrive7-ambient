@@ -139,7 +139,7 @@ function details(db) {
             for (const f of fields) {
                 const fd = (i.fields || {})[f];
                 if (!fd) { lines.push({ head: true, text: '  ' + f + ': not in this interface' }); continue; }
-                const ids = ['getter', 'notifier', 'setter'].filter((k) => fd[k] != null).map((k) => k + ' ' + fd[k]).join(', ') || 'no getter / notifier / setter';
+                const ids = ['getter', 'notifier', 'setter'].filter((k) => fd[k] != null).map((k) => k + ' ' + (typeof fd[k] === 'object' ? JSON.stringify(fd[k]) : fd[k])).join(', ') || 'no getter / notifier / setter';
                 lines.push({ head: true, text: '  ' + f + '   (' + ids + ')' });
                 typeLines(db, fd.dataRef, 2, []).forEach((l) => wrap(l, WRAP).forEach((w) => lines.push({ text: w })));
             }
@@ -172,8 +172,12 @@ mgu.run({
         const events = [], subs = {};
         let profile = null;
         const logFile = path.join(ctx.dataDir || '.', 'live.log');
+        const last = {};
         const record = (l, value, fake) => {
-            if (l.key === 'profile') profile = JSON.stringify(value);
+            const js = JSON.stringify(value);
+            if (last[l.field] === js) return; // the 5 s re-read repeats unchanged values
+            last[l.field] = js;
+            if (l.key === 'profile') profile = js;
             const e = { time: new Date().toISOString().replace('T', ' ').slice(0, 19), field: l.field, key: l.key, profile, value, fake: !!fake };
             events.unshift(e);
             events.length = Math.min(events.length, LOG_KEEP);
@@ -183,7 +187,7 @@ mgu.run({
             if (mode === 2) kick();
         };
         for (const l of LIVE) {
-            ctx.signals.watch(l.iface, l.inst, { [l.field]: (v) => record(l, v) }, log)
+            ctx.signals.watch(l.iface, l.inst, { [l.field]: (v) => record(l, v) }, log, { pollMs: 5000 })
                 .then((s) => { subs[l.field] = s.error ? 'error: ' + s.error : 'subscribed'; log.info('live ' + l.field + ': ' + subs[l.field]); })
                 .catch((e) => { subs[l.field] = 'error: ' + e; });
         }
@@ -244,5 +248,7 @@ if (process.argv.includes('--test')) {
     const long = 'x '.repeat(200) + 'END';
     assert.strictEqual(wrap(long, 50).map((s) => s.trim()).join(' ').replace(/ +/g, ' '), long.replace(/ +/g, ' '), 'wrap keeps all text');
     assert.ok(wrap('y'.repeat(300), 50).every((s) => s.length <= 50));
+    const objDb = { interfaces: { X: { serviceId: 0xb09e, fields: { currentInteriorLightProfile: { getter: { id: 1 }, dataRef: 'UInt8' } } } } };
+    assert.ok(details(objDb).some((l) => l.text.includes('getter {"id":1}')), 'getter as object');
     console.log('ok');
 }

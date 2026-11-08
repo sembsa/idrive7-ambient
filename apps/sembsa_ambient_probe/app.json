@@ -2,7 +2,7 @@
   "id": "sembsa_ambient_probe",
   "title": "Ambient Probe",
   "description": "Read-only: shows the ambient light fields of the head unit SOME/IP catalog (0xB512, 0xB09E) in full and logs the car's ambient colour notifications with a time stamp. Writes nothing to the car",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "vendor": "custom",
   "loggingId": "OAA9",
   "iconGlyph": "AL",
